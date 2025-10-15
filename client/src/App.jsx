@@ -1,10 +1,24 @@
 import React from "react";
+import { useState } from "react";
+import { useRef } from "react";
 
 // ImageUploadUI - React + Tailwind CSS
 // NOTE: This file contains only presentational UI (no state, no event handlers).
 // You can plug in your upload logic, handlers and props where indicated.
 
 const App = ()=> {
+  const [fileField,setFileField]=useState('')
+  const [Img,setImg]=useState('')
+  let currentImg = useRef()
+  
+  const handleImageUpload = (e)=>{
+    let fileData= e.target.files[0]
+    let imgUrl = URL.createObjectURL(fileData)
+    setImg(imgUrl)
+    console.log(fileData);
+    
+
+  }
   return (
     <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
       <div className="w-full max-w-5xl">
@@ -21,16 +35,45 @@ const App = ()=> {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Dropzone (visual only) */}
             <div className="col-span-1 md:col-span-2">
-              <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center h-56 md:h-72">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16v-4a4 4 0 014-4h1m4 8V8m0 0l-3 3m3-3l3 3" />
-                </svg>
-                <div className="text-center">
-                  <p className="text-lg font-medium text-slate-700">Drop images here</p>
-                  <p className="text-sm text-slate-500 mt-1">or</p>
-                  <button className="mt-3 inline-flex items-center px-4 py-2 rounded-lg bg-slate-800 text-white text-sm shadow-sm">Choose files</button>
-                </div>
-                <p className="mt-4 text-xs text-slate-400">Supported: JPG, PNG, GIF — Max 10MB each</p>
+              <div  className="border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center h-56 md:h-72">
+                {Img ? (
+                  <div className="w-[600px] flex justify-center items-center rounded-[5px] h-[400px] overflow-hidden">
+                    <img className="w-full" src={Img} alt="Image" />
+                  </div>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-12 w-12 text-slate-400 mb-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                        d="M7 16v-4a4 4 0 014-4h1m4 8V8m0 0l-3 3m3-3l3 3"
+                      />
+                    </svg>
+                    <div className="text-center">
+                      <p className="text-lg font-medium text-slate-700">Drop images here</p>
+                      <p className="text-sm text-slate-500 mt-1">or</p>
+                      <form>
+                        <input onChange={handleImageUpload} type="file" hidden ref={currentImg} />
+                      </form>
+                      <button
+                        onClick={() => currentImg.current.click()}
+                        className="mt-3 inline-flex items-center px-4 py-2 rounded-lg bg-slate-800 text-white text-sm shadow-sm"
+                      >
+                        Choose files
+                      </button>
+                    </div>
+                    <p className="mt-4 text-xs text-slate-400">
+                      Supported: JPG, PNG, GIF — Max 10MB each
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Hint / Tips */}
@@ -63,7 +106,9 @@ const App = ()=> {
                 </div>
 
                 <div className="mt-4">
-                  <button className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm">Start upload</button>
+                  <button className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm">
+                    Start upload
+                  </button>
                 </div>
               </div>
             </aside>
@@ -75,13 +120,23 @@ const App = ()=> {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {/* Image card (repeat visually) */}
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div
+                  key={i}
+                  className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
+                >
                   <div className="relative h-36 bg-slate-100 flex items-center justify-center">
-                    <img src={`https://picsum.photos/seed/${i + 1}/400/300`} alt={`preview-${i}`} className="object-cover w-full h-full" />
+                    <img
+                      src={`https://picsum.photos/seed/${i + 1}/400/300`}
+                      alt={`preview-${i}`}
+                      className="object-cover w-full h-full"
+                    />
                     {/* Progress overlay (visual only) */}
                     <div className="absolute inset-x-0 bottom-0 p-2">
                       <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(i + 1) * 10}%` }} />
+                        <div
+                          className="h-full rounded-full bg-emerald-500"
+                          style={{ width: `${(i + 1) * 10}%` }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -91,8 +146,19 @@ const App = ()=> {
                       <div className="text-xs text-slate-600 truncate">image_{i + 1}.jpg</div>
                       <div className="flex items-center space-x-2">
                         {/* Drag handle visual */}
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 7h16M4 12h16M4 17h16" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-slate-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                            d="M4 7h16M4 12h16M4 17h16"
+                          />
                         </svg>
                         {/* Action icons (visual only) */}
                         <button className="text-xs text-slate-500">Edit</button>
@@ -120,13 +186,18 @@ const App = ()=> {
           <div className="text-sm text-slate-600">Selected 0 files</div>
           <div className="flex items-center gap-3">
             <button className="px-4 py-2 rounded-lg border border-slate-200 text-sm">Clear</button>
-            <button className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">Upload all</button>
+            <button className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">
+              Upload all
+            </button>
           </div>
         </div>
 
         {/* Notes */}
         <div className="mt-6 text-xs text-slate-400">
-          <p>Note: This component is presentational only — integrate file input, drag/drop, state and upload handlers where needed.</p>
+          <p>
+            Note: This component is presentational only — integrate file input, drag/drop, state and
+            upload handlers where needed.
+          </p>
         </div>
       </div>
     </div>
