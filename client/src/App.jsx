@@ -13,7 +13,7 @@ const App = ()=> {
   const [backendImg,setBackendImg]=useState('')
   const [Img,setImg]=useState('')
   const [loading,setLoading]=useState(false)
-  const [uploadedImg,setUploadedImg]=useState('' || [])
+  const [uploadedImg,setUploadedImg]=useState([] || '')
   const [upload,setUpload]=useState('')
   let currentImg = useRef()
  
@@ -25,6 +25,10 @@ const App = ()=> {
   }
   // http://localhost:4000/img/imgUpload
 const handleUpload =async()=>{
+  if(!Img){
+    alert('please first select an image!')
+    return 
+  }
   let myFormData= new FormData()
   myFormData.append(
       'image',backendImg
@@ -33,10 +37,9 @@ const handleUpload =async()=>{
    let res = await axios.post('http://localhost:4000/img/imgUpload',myFormData,{
       withCredentials:true
     })
-      console.log(res)
       setUpload(res.data)
-      console.log(upload,'upload')
     setLoading(false)
+    setImg('')
   } catch (error) {
     setLoading(false)
     console.log(error)
@@ -48,7 +51,6 @@ const handleUpload =async()=>{
 const getAllImg=async()=>{
   try {
    let res =await axios.get('http://localhost:4000/img')
-   console.log(res.data)
    setUploadedImg(res.data)
   } catch (error) {
     console.log(error)
@@ -56,23 +58,31 @@ const getAllImg=async()=>{
 }
 
 // delete removeFile 
-const handleRemove=async(image)=>{
-  let data = ''
-  if(image){
-     data += image?.imageLink.split('/')[7].split('.')[0]
-  }
-  console.log(data,'iam deleted data');
-  
-  try {
-    if(!data){
-      return console.log(`id not found${data}`)
-    }
-    await axios.delete('http://localhost:4000/img/imgUpload',{imgId:data},{withCredentials:true})
+const handleRemove = async (id) => {
 
+  // if (!image) return;
+
+  try {
+    // Extract Cloudinary public_id from imageLink
+    // const imgId = image?.imageLink.split('/')[7].split('.')[0]; 
+    // console.log(imgId, 'will be deleted');
+    // const myFormData = new FormData()
+    // myFormData.append('imgId',imgId)
+    try {
+     await axios.delete(`http://localhost:4000/img/deleteImg/${id}`).then(()=>{}).catch(e=>{
+        console.log(e)
+      })
+
+    } catch (error) {
+      console.log(error)
+    }
+
+    // Refresh UI automatically after deletion
+    getAllImg();
   } catch (error) {
-    console.log(error)
+    console.error(error);
   }
-}
+};
 useEffect(()=>{
   getAllImg()
 },[upload])
@@ -182,7 +192,8 @@ useEffect(()=>{
                 key={i}
                 className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
                 >
-                  {console.log(image.imageLink.split('/')[7].split('.')[0])}
+                  {/* {console.log(image.imageLink.split('/')[7].split('.')[0])} */}
+                  {/* {console.log(image._id)} */}
                   <div className="relative h-36 bg-slate-100 flex items-center justify-center">
                     <img
                       src={`${image?.imageLink}`}
@@ -221,7 +232,7 @@ useEffect(()=>{
                         </svg>
                         {/* Action icons (visual only) */}
                         <button className="text-xs text-slate-500">Edit</button>
-                        <button onClick={()=>handleRemove(image)} className="text-xs text-rose-500">Remove</button>
+                        <button onClick={()=>handleRemove(image?._id)} className="text-xs text-rose-500">Remove</button>
                       </div>
                     </div>
                     <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">

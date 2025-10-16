@@ -25,13 +25,18 @@ const uploadResult = await cloudinary.uploader
   return res.status(201).json(imgUrl)
 }
 // delete image 
-const deleteImage=(req,res)=>{
+const deleteImage=async(req,res)=>{
     try {
-      const {imgId}=req.body
-    if(!imgId){
-      return res.status(404).json({message:'image Id not found!'})
+      // const {imgId}=req.body
+      const {id}=req.params
+    // if(!imgId){
+    //   return res.status(404).json({message:'image Id not found!'})
+    // }
+    if(id){
+      await imageHostModel.findByIdAndDelete({_id:id})
+
     }
-     cloudinary.uploader.destroy(imgId)
+    // await cloudinary.uploader.destroy(imgId)
     res.status(200).json({message:'image deleted successfully'})
     } catch (error) {
       console.log(error)

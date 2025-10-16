@@ -2,7 +2,6 @@ const express = require('express')
 // const dbConnection = require('./src/config/db.js')
 const cors = require('cors')
 const route  = require('./src/routes/routes')
-const { default: mongoose } = require('mongoose')
 const dbConnection = require('./src/config/db')
 require('dotenv').config()
 const app = express()
@@ -12,6 +11,7 @@ app.use(cors({
     credentials:true
 }))
 app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 app.use(route)
 app.listen(port,(e)=>{
     dbConnection()
