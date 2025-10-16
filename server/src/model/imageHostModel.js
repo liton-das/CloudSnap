@@ -7,5 +7,4 @@ const imageSchema = new Schema({
     }
 },{timestamps:true})
 
-const UploadImage = model('uploadImage',imageSchema)
-module.exports=UploadImage
+module.exports = model('uploadImage',imageSchema)

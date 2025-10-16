@@ -1,5 +1,5 @@
-const generateShortCode = require("../helper/generateShortCode");
-const UploadImage = require("../model/imageHostModel");
+const imageHostModel = require('../model/imageHostModel');
+
 const cloudinary = require('cloudinary').v2
 // cloudinary configuration
  cloudinary.config({
@@ -19,19 +19,35 @@ const uploadResult = await cloudinary.uploader
     console.log(error);
   });
   const imgUrl = uploadResult.url
-  await new UploadImage({
+     await new imageHostModel({
     imageLink:imgUrl
   }).save()
-  console.log(imgUrl)
   return res.status(201).json(imgUrl)
 }
 // delete image 
-const deleteImage=async(req,res)=>{
-    const {imgId}=req.body
-    cloudinary.uploader.destroy(imgId)
+const deleteImage=(req,res)=>{
+    try {
+      const {imgId}=req.body
+    if(!imgId){
+      return res.status(404).json({message:'image Id not found!'})
+    }
+     cloudinary.uploader.destroy(imgId)
     res.status(200).json({message:'image deleted successfully'})
+    } catch (error) {
+      console.log(error)
+    }
+}
+// get all images 
+const getAllImagesController =async(req,res)=>{
+  try {
+    const images = await imageHostModel.find().sort({createdAt:-1})
+    res.status(200).json(images)
+  } catch (error) {
+    console.log(error)
+  }
 }
 module.exports = {
     imageUplaodController,
-    deleteImage
+    deleteImage,
+    getAllImagesController
 }

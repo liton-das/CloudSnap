@@ -1,24 +1,82 @@
 import React from "react";
+import axios from "axios";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
-
+import moment from 'moment';
 // ImageUploadUI - React + Tailwind CSS
 // NOTE: This file contains only presentational UI (no state, no event handlers).
 // You can plug in your upload logic, handlers and props where indicated.
 
 const App = ()=> {
   const [fileField,setFileField]=useState('')
+  const [backendImg,setBackendImg]=useState('')
   const [Img,setImg]=useState('')
+  const [loading,setLoading]=useState(false)
+  const [uploadedImg,setUploadedImg]=useState('' || [])
+  const [upload,setUpload]=useState('')
   let currentImg = useRef()
-  
+ 
   const handleImageUpload = (e)=>{
     let fileData= e.target.files[0]
+    setBackendImg(fileData)
     let imgUrl = URL.createObjectURL(fileData)
     setImg(imgUrl)
-    console.log(fileData);
-    
-
   }
+  // http://localhost:4000/img/imgUpload
+const handleUpload =async()=>{
+  let myFormData= new FormData()
+  myFormData.append(
+      'image',backendImg
+  )
+  try {
+   let res = await axios.post('http://localhost:4000/img/imgUpload',myFormData,{
+      withCredentials:true
+    })
+      console.log(res)
+      setUpload(res.data)
+      console.log(upload,'upload')
+    setLoading(false)
+  } catch (error) {
+    setLoading(false)
+    console.log(error)
+  }
+  finally{
+    setLoading(false)
+  }
+}
+const getAllImg=async()=>{
+  try {
+   let res =await axios.get('http://localhost:4000/img')
+   console.log(res.data)
+   setUploadedImg(res.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// delete removeFile 
+const handleRemove=async(image)=>{
+  let data = ''
+  if(image){
+     data += image?.imageLink.split('/')[7].split('.')[0]
+  }
+  console.log(data,'iam deleted data');
+  
+  try {
+    if(!data){
+      return console.log(`id not found${data}`)
+    }
+    await axios.delete('http://localhost:4000/img/imgUpload',{imgId:data},{withCredentials:true})
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+useEffect(()=>{
+  getAllImg()
+},[upload])
+// console.log(uploadedImg[0].imageLink,'uploaded')
   return (
     <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
       <div className="w-full max-w-5xl">
@@ -106,7 +164,7 @@ const App = ()=> {
                 </div>
 
                 <div className="mt-4">
-                  <button className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm">
+                  <button onClick={handleUpload} className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm">
                     Start upload
                   </button>
                 </div>
@@ -119,14 +177,15 @@ const App = ()=> {
             <h4 className="text-sm font-medium text-slate-700 mb-3">Files</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {/* Image card (repeat visually) */}
-              {Array.from({ length: 8 }).map((_, i) => (
+              {uploadedImg?.map((image, i) => (
                 <div
-                  key={i}
-                  className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
+                key={i}
+                className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
                 >
+                  {console.log(image.imageLink.split('/')[7].split('.')[0])}
                   <div className="relative h-36 bg-slate-100 flex items-center justify-center">
                     <img
-                      src={`https://picsum.photos/seed/${i + 1}/400/300`}
+                      src={`${image?.imageLink}`}
                       alt={`preview-${i}`}
                       className="object-cover w-full h-full"
                     />
@@ -162,12 +221,12 @@ const App = ()=> {
                         </svg>
                         {/* Action icons (visual only) */}
                         <button className="text-xs text-slate-500">Edit</button>
-                        <button className="text-xs text-rose-500">Remove</button>
+                        <button onClick={()=>handleRemove(image)} className="text-xs text-rose-500">Remove</button>
                       </div>
                     </div>
                     <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">
                       <span>1.2 MB</span>
-                      <span>375×250</span>
+                      <span className="text-blue-500">{moment(image.createdAt).fromNow()}</span>
                     </div>
                   </div>
                 </div>
