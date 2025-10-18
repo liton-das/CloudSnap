@@ -31,17 +31,16 @@ const imageUplaodController=async(req,res)=>{
 }
 // delete image 
 const deleteImage=async(req,res)=>{
-    try {
-      // const {imgId}=req.body
-      const {imgLink}=req.body
-    if(!imgLink){
-      return res.status(404).json({message:'image Id not found!'})
-    }
-    const existImg=await imageHostModel.findOne({imageLink:imgLink})
-    console.log(existImg)
-    res.send(existImg)
-    // await cloudinary.uploader.destroy(imgId)
-    // res.status(200).json({message:'image deleted successfully'})
+  try {
+      const {imgLink} = req.params
+      const existImg = await imageHostModel.findOne({imgLink:imgLink._id})
+      if(!existImg){
+        return res.status(404).json({message:'existing image not found!'})
+      }
+      const imgId = existImg.imageLink.split('/')[7].split('.')[0]
+      await imageHostModel.findByIdAndDelete(existImg)
+      await cloudinary.uploader.destroy(imgId)
+      return res.status(200).json({message:'delete successfully!'})
     } catch (error) {
       console.log(error)
     }

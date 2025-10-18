@@ -3,7 +3,7 @@ const multer  = require('multer')
 const imgUploadApi=require('express').Router()
 const upload = multer({ dest: 'uploads/' })
 imgUploadApi.post('/imgUpload', upload.single('image'),imageUplaodController)
-imgUploadApi.delete('/deleteImg',deleteImage)
+imgUploadApi.delete('/deleteImg/:imgLink',deleteImage)
 imgUploadApi.get('/',getAllImagesController)
 
 module.exports={
