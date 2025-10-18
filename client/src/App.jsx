@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
 import moment from 'moment';
+import Headers from "./components/Headers";
 // ImageUploadUI - React + Tailwind CSS
 // NOTE: This file contains only presentational UI (no state, no event handlers).
 // You can plug in your upload logic, handlers and props where indicated.
@@ -25,9 +26,12 @@ const App = ()=> {
   }
   // http://localhost:4000/img/imgUpload
 const handleUpload =async()=>{
+  setLoading(true)
   if(!Img){
+    setLoading(true)
     alert('please first select an image!')
-    return 
+  }else{
+    setLoading(false)
   }
   let myFormData= new FormData()
   myFormData.append(
@@ -38,7 +42,7 @@ const handleUpload =async()=>{
       withCredentials:true
     })
       setUpload(res.data)
-    setLoading(false)
+      setLoading(false)
     setImg('')
   } catch (error) {
     setLoading(false)
@@ -58,7 +62,7 @@ const getAllImg=async()=>{
 }
 
 // delete removeFile 
-const handleRemove = async (id) => {
+const handleRemove = async (imgLink) => {
 
   // if (!image) return;
 
@@ -69,7 +73,7 @@ const handleRemove = async (id) => {
     // const myFormData = new FormData()
     // myFormData.append('imgId',imgId)
     try {
-     await axios.delete(`http://localhost:4000/img/deleteImg/${id}`).then(()=>{}).catch(e=>{
+     await axios.delete(`http://localhost:4000/img/deleteImg`,{imgLink}).then(()=>{}).catch(e=>{
         console.log(e)
       })
 
@@ -91,12 +95,7 @@ useEffect(()=>{
     <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
       <div className="w-full max-w-5xl">
         {/* Header */}
-        <header className="mb-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-800">Image Upload</h1>
-            <p className="text-sm text-slate-500">Drag & drop or click to upload — responsive UI</p>
-          </div>
-        </header>
+        <Headers/>
 
         {/* Upload Card */}
         <section className="bg-white rounded-2xl shadow-md p-6">
@@ -147,7 +146,10 @@ useEffect(()=>{
               {/* Hint / Tips */}
               <div className="mt-4 text-sm text-slate-500">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Multiple files supported (UI shows thumbnails).</li>
+                  <li>
+                    Image Link : 
+                    <a className="text-blue-500" target="_blank" href={uploadedImg[0]?.imageLink}>({uploadedImg[0]?.imageLink}).</a>
+                  </li>
                   <li>You can reorder uploads — drag handles shown in thumbnails.</li>
                   <li>Each thumbnail displays a progress placeholder and actions.</li>
                 </ul>
@@ -175,7 +177,9 @@ useEffect(()=>{
 
                 <div className="mt-4">
                   <button onClick={handleUpload} className="w-full px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm">
-                    Start upload
+                    {
+                      !loading ? 'Start upload' :'Loading.......'
+                    }
                   </button>
                 </div>
               </div>
@@ -232,7 +236,7 @@ useEffect(()=>{
                         </svg>
                         {/* Action icons (visual only) */}
                         <button className="text-xs text-slate-500">Edit</button>
-                        <button onClick={()=>handleRemove(image?._id)} className="text-xs text-rose-500">Remove</button>
+                        <button onClick={()=>handleRemove(image?.imageLink)} className="text-xs text-rose-500">Remove</button>
                       </div>
                     </div>
                     <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">
@@ -253,7 +257,7 @@ useEffect(()=>{
 
         {/* Footer actions */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-sm text-slate-600">Selected 0 files</div>
+          <div className="text-sm text-slate-600">Selected {uploadedImg.length} files</div>
           <div className="flex items-center gap-3">
             <button className="px-4 py-2 rounded-lg border border-slate-200 text-sm">Clear</button>
             <button className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">
@@ -261,7 +265,6 @@ useEffect(()=>{
             </button>
           </div>
         </div>
-
         {/* Notes */}
         <div className="mt-6 text-xs text-slate-400">
           <p>

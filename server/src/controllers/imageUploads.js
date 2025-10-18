@@ -1,5 +1,5 @@
 const imageHostModel = require('../model/imageHostModel');
-
+const fs = require('fs')
 const cloudinary = require('cloudinary').v2
 // cloudinary configuration
  cloudinary.config({
@@ -9,35 +9,39 @@ const cloudinary = require('cloudinary').v2
  });
 
 const imageUplaodController=async(req,res)=>{
-    const img = req.file
-    // upload image on cloudinary
-const uploadResult = await cloudinary.uploader
-  .upload(img.path, {
-    public_id: Date.now(),
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-  const imgUrl = uploadResult.url
-     await new imageHostModel({
-    imageLink:imgUrl
-  }).save()
-  return res.status(201).json(imgUrl)
+ try {
+   const image = req.file;
+   // upload image on cloudinary
+   const uploadResult = await cloudinary.uploader
+     .upload(image.path, {
+       public_id: Date.now(),
+     })
+     .catch((error) => {
+       console.log(error);
+     });
+   fs.unlinkSync(image.path)
+  let imgUrl =  await new imageHostModel({
+     imageLink: uploadResult.url,
+    }).save();
+   return res.status(201).json(imgUrl);
+ } catch (error) {
+  fs.unlinkSync(image.path)
+  return res.status(500).json({message:'Internal server error!'})
+ }
 }
 // delete image 
 const deleteImage=async(req,res)=>{
     try {
       // const {imgId}=req.body
-      const {id}=req.params
-    // if(!imgId){
-    //   return res.status(404).json({message:'image Id not found!'})
-    // }
-    if(id){
-      await imageHostModel.findByIdAndDelete({_id:id})
-
+      const {imgLink}=req.body
+    if(!imgLink){
+      return res.status(404).json({message:'image Id not found!'})
     }
+    const existImg=await imageHostModel.findOne({imageLink:imgLink})
+    console.log(existImg)
+    res.send(existImg)
     // await cloudinary.uploader.destroy(imgId)
-    res.status(200).json({message:'image deleted successfully'})
+    // res.status(200).json({message:'image deleted successfully'})
     } catch (error) {
       console.log(error)
     }
