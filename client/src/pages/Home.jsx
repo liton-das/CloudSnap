@@ -14,15 +14,16 @@ const Home = () => {
   const [loading,setLoading]=useState(false)
   const [uploadedImg,setUploadedImg]=useState([] || '')
   const [upload,setUpload]=useState('')
+  const [imgSize,setImgSize] = useState(null)
   let currentImg = useRef()
  
 const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-  
       setBackendImg(file)
       setImg(URL.createObjectURL(file));
-
+      const fileSize = file.size / (1024*1024)
+      setImgSize(fileSize.toFixed(2))
   };
 
   const handleImageUpload = (e)=>{
@@ -32,6 +33,8 @@ const handleDrop = (e) => {
     setBackendImg(fileData)
     let imgUrl = URL.createObjectURL(fileData)
     setImg(imgUrl)
+    const fileSize = fileData.size / (1024 * 1024)
+    setImgSize(fileSize.toFixed(2))
   }
 
   // http://localhost:4000/img/imgUpload
@@ -271,7 +274,7 @@ const handleRemoveImg=()=>{
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                        <span>1.2 MB</span>
+                        <span>{imgSize} MB</span>
                         <span className="text-blue-500">{moment(image.createdAt).fromNow()}</span>
                       </div>
                     </div>
