@@ -1,3 +1,4 @@
+const formateFileSize = require('../helper/formateFileSize');
 const imageHostModel = require('../model/imageHostModel');
 const fs = require('fs')
 const cloudinary = require('cloudinary').v2
@@ -11,6 +12,7 @@ const cloudinary = require('cloudinary').v2
 const imageUplaodController=async(req,res)=>{
  try {
    const image = req.file;
+   let formatedFile=formateFileSize(image.size)
    // upload image on cloudinary
    const uploadResult = await cloudinary.uploader
      .upload(image.path, {
@@ -22,6 +24,7 @@ const imageUplaodController=async(req,res)=>{
    fs.unlinkSync(image.path)
   let imgUrl =  await new imageHostModel({
      imageLink: uploadResult.url,
+     size:formatedFile
     }).save();
    return res.status(201).json(imgUrl);
  } catch (error) {

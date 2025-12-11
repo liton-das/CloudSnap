@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 
 const dbConnection =async()=>{
     try {
-        await mongoose.connect(`mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.8fmkte3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+        await mongoose.connect(`mongodb://localhost:27017/CloudSnap?directConnection=true`)
         console.log('db connected')
     } catch (error) {
         console.log('db not connected!')
