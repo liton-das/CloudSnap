@@ -7,7 +7,7 @@ require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 8080
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:'https://cloud-snap-qb6l.vercel.app',
     credentials:true
 }))
 app.use(express.json())
