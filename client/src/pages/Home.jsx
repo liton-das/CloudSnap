@@ -50,7 +50,8 @@ const handleUpload =async()=>{
       'image',backendImg
   )
   try {
-   let res = await axios.post('http://localhost:4000/img/imgUpload',myFormData,{
+    //http://localhost:4000/img/imgUpload',myFormData
+   let res = await axios.post(`${import.meta.env.VITE_API_URL}/img/imgUpload`,myFormData,{
       withCredentials:true
     })
       setUpload(res.data)
@@ -69,7 +70,8 @@ const handleUpload =async()=>{
   const handleDragOver = (e) => e.preventDefault();
 const getAllImg=async()=>{
   try {
-   let res =await axios.get('http://localhost:4000/img')
+    //http://localhost:4000/img
+   let res =await axios.get(`${import.meta.env.VITE_API_URL}/img`)
    setUploadedImg(res.data)
   } catch (error) {
     console.log(error)
@@ -79,7 +81,8 @@ const getAllImg=async()=>{
 // delete removeFile 
 const handleRemove = async (imgLink) => {
    try {
-     await axios.delete(`http://localhost:4000/img/deleteImg/${imgLink}`,{
+    // http://localhost:4000/img/deleteImg/${imgLink}
+     await axios.delete(`${import.meta.env.VITE_API_URL}/img/deleteImg/${imgLink}`,{
       withCredentials:true
     })
     getMessage.success('image deleted successfully')
