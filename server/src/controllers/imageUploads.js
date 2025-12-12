@@ -11,20 +11,23 @@ const cloudinary = require('cloudinary').v2
 
 const imageUplaodController=async(req,res)=>{
  try {
+  const base64 = req.file.buffer.toString('base64')
+  const uploadData = `data:${req.file.mimetype};base64,${base64}`
    const image = req.file;
    let formatedFile=formateFileSize(image.size)
    // upload image on cloudinary
    const uploadResult = await cloudinary.uploader
-     .upload(image.path, {
+     .upload(uploadData, {
+       folder:'CloudSnap',
        public_id: Date.now(),
      })
+    //  fs.unlinkSync(image.path)
      .catch((error) => {
        console.log(error);
      });
-   fs.unlinkSync(image.path)
-  let imgUrl =  await new imageHostModel({
-     imageLink: uploadResult.url,
-     size:formatedFile
+    let imgUrl =  await new imageHostModel({
+    imageLink: uploadResult.url,
+    size:formatedFile
     }).save();
    return res.status(201).json(imgUrl);
  } catch (error) {
