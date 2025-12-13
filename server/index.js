@@ -7,13 +7,13 @@ require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 8080
 app.use(cors({
-    origin:'https://cloud-snap-qb6l.vercel.app',
+    origin:"*",
     credentials:true
 }))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(route)
-app.listen(port,(e)=>{
+app.listen(port,"0.0.0.0",(e)=>{
     dbConnection()
     if(e){
         console.log(e)
