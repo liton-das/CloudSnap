@@ -57,9 +57,9 @@ const Home = () => {
     setUploadedImg(res.data);
   };
 
-  const handleRemove = async (id) => {
+  const handleRemove = async (imgLink) => {
     await axios.delete(
-      `${import.meta.env.VITE_API_URL}/img/deleteImg/${id}`,
+      `${import.meta.env.VITE_API_URL}/img/deleteImg/${imgLink}`,
       { withCredentials: true }
     );
     getMessage.success("image deleted successfully");
@@ -98,7 +98,7 @@ const Home = () => {
                       className="w-full h-full object-contain"
                     />
                     <button
-                      onClick={()=>handleRemove(Img?._id)}
+                      onClick={handleRemoveImg}
                       className="absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-red-500 text-white text-sm shadow"
                     >
                       Remove
@@ -156,7 +156,7 @@ const Home = () => {
                     <div className="flex justify-between">
                       <span>image_{i + 1}.jpg</span>
                       <button
-                        onClick={() => handleRemove(img._id)}
+                        onClick={() => handleRemove(img?._id)}
                         className="text-rose-500"
                       >
                         Remove
