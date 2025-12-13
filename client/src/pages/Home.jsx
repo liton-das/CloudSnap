@@ -98,7 +98,7 @@ const Home = () => {
                       className="w-full h-full object-contain"
                     />
                     <button
-                      onClick={handleRemove}
+                      onClick={()=>handleRemove(Img?._id)}
                       className="absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-red-500 text-white text-sm shadow"
                     >
                       Remove
